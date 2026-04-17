@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Data — raw large files (GFF/FASTA not tracked, use NCBI accessions)
+annotations/
+*.gff
+*.gbk
+*.fasta
+*.fa
+*.fna
+
+# Secrets / credentials
+*.env
+.env
+secrets/
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large intermediate files
+preprocess/output/*.json

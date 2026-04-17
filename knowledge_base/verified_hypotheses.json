@@ -1,0 +1,315 @@
+{
+  "_meta": {
+    "schema_version": "2.0.0",
+    "project": "Project Genesis",
+    "description": "经验证的假设知识库。每轮实验循环后追加新发现。",
+    "created": "2026-04-16",
+    "last_updated": "2026-04-17",
+    "total_verified": 7,
+    "total_rejected": 3,
+    "total_pending": 2
+  },
+  "prior_beliefs": {
+    "description": "先验知识（来自文献，影响新假设生成方向）",
+    "known_facts": [
+      {
+        "fact_id": "LIT-001",
+        "statement": "Deinococcus radiodurans 通过多拷贝RecA和高效DNA修复实现极端辐射抗性",
+        "source": "Cox MM et al. (2000) PNAS",
+        "relevance": "支持H-001的生物学合理性"
+      },
+      {
+        "fact_id": "LIT-002",
+        "statement": "ISS微生物组特征研究（Checinska Sielaff 2019）报道了16S rRNA水平的ISS微生物多样性，但缺乏基因组功能层面的系统分析",
+        "source": "Checinska Sielaff A et al. (2019) Microbiome",
+        "relevance": "支持本项目的研究空白性；SESSION-008 GLDS-224 群落分析与之形成补充（WGS层面验证）"
+      },
+      {
+        "fact_id": "LIT-003",
+        "statement": "Bacillus 属细菌在ISS表面广泛分布，Staphylococcus 为常见污染物",
+        "source": "Venkateswaran K et al. (2001) Appl Environ Microbiol",
+        "relevance": "与PRJNA637984、GLDS-224 ISS群落（Staphylococcus 20.2%，Corynebacterium 11.2%）一致"
+      },
+      {
+        "fact_id": "LIT-004",
+        "statement": "微重力条件下，细菌生物膜形成能力增强",
+        "source": "Kim W et al. (2013) npj Microgravity",
+        "relevance": "H-new-A背景（孢子化/生物膜替代CRISPR）"
+      },
+      {
+        "fact_id": "LIT-005",
+        "statement": "Chernobyl 放射性废墟中黑色素化真菌（Cladosporium sphaerospermum等）具有辐射营养特性",
+        "source": "Dadachova E et al. (2007) PLoS ONE",
+        "relevance": "GLDS-132 ISS×Chernobyl真菌比较的文献基础"
+      },
+      {
+        "fact_id": "LIT-006",
+        "statement": "CRISPR-Cas系统通过切割外来DNA对插入序列（IS元件）和噬菌体有抑制作用；CRISPR缺失理论上可能导致IS元件积累",
+        "source": "Krupovic M & Koonin EV (2015) Trends Microbiol",
+        "relevance": "H-new-B的理论预测依据；SESSION-008数据显示H-new-B被反驳（IS实际减少），由此衍生H-new-C"
+      }
+    ]
+  },
+  "experiments": [
+    {
+      "exp_id": "EXP-001",
+      "hypothesis": "H-001",
+      "title": "ISS Bacillales LexA 拷贝数比较",
+      "session": "SESSION-003 / SESSION-005",
+      "date": "2026-04-16 / 2026-04-17",
+      "status": "RETRACTED",
+      "verdict": "❌ 撤回（PSR-017伪计数）",
+      "method": "GFF product= 字段关键词匹配（含 'SOS' 关键词）",
+      "result_raw": "原始结果 ISS=3.x vs Ground=1.0（PSR-017伪计数）",
+      "result_corrected": "修正后：ISS=1.00 vs Ground=1.00，Cliff delta=0，无差异",
+      "root_cause": "PSR-017: 'SOS' 关键词作为子串匹配 stressosome/lysosomal 蛋白",
+      "lesson": "关键词必须为 ≥3 个英文单词完整短语，禁止使用单字缩写"
+    },
+    {
+      "exp_id": "EXP-002",
+      "hypothesis": "H-002",
+      "title": "ISS Bacillales 抗氧化基因拷贝数",
+      "session": "SESSION-003",
+      "date": "2026-04-16",
+      "status": "COMPLETED",
+      "verdict": "❌ NOT_SUPPORTED",
+      "method": "GFF product= 精确短语匹配，Mann-Whitney U + BH FDR",
+      "result": "sodA/katA/dps/ahpC 全部无显著差异（p_adj > 0.05）",
+      "effect_sizes": "Cliff delta 范围 -0.156 to +0.089",
+      "scientific_value": "排除了抗氧化基因数量扩增作为ISS适应机制"
+    },
+    {
+      "exp_id": "EXP-003",
+      "hypothesis": "H-003",
+      "title": "ISS Bacillales CRISPR-Cas 缺失（PRJNA637984 WGS）",
+      "session": "SESSION-003",
+      "date": "2026-04-16",
+      "status": "COMPLETED",
+      "verdict": "✅ CONFIRMED",
+      "method": "GFF CDS注释中精确 cas 基因名 + product 短语匹配",
+      "result": "30/30 ISS株 CRISPR 完全缺失（100%缺失率）",
+      "controls": "Ground 55株：部分有CRISPR（Bacillus amyloliquefaciens等）",
+      "replication_datasets": ["EXP-007 (GLDS-224 宏基因组)", "EXP-009 (GLDS-224 群落组成)"]
+    },
+    {
+      "exp_id": "EXP-004",
+      "hypothesis": "KVTAG",
+      "title": "LexA KVTAG 自切割位点结构分析",
+      "session": "SESSION-004 / SESSION-006",
+      "date": "2026-04-16 / 2026-04-17",
+      "status": "COMPLETED",
+      "verdict": "✅ CONFIRMED",
+      "method": "AF3 预测 CIF 文件解析，主链 C-N 键长 + ω角测量",
+      "result": {
+        "position": "4物种统一：K=92, Ala=95-Gly=96 切割位点",
+        "bond_length_range": "1.329–1.342 Å（正常平面肽键）",
+        "omega_angle_range": "171–178°",
+        "context": "VVGKVTAGLPI（4物种100%保守）"
+      },
+      "scientific_value": "LexA SOS调控机制在ISS菌株中结构保守，KVTAG可作为生物标记"
+    },
+    {
+      "exp_id": "EXP-005",
+      "hypothesis": "LexA-paralog",
+      "title": "B. thuringiensis LexA 旁系同源发现",
+      "session": "SESSION-005",
+      "date": "2026-04-17",
+      "status": "COMPLETED",
+      "verdict": "⚪ PRELIMINARY",
+      "method": "GFF 坐标分析，ISS 11/11 vs Ground 10/15 携带",
+      "result": "距规范lexA约8,875bp，ISS株100%携带，Ground=67%，差异不显著",
+      "scientific_value": "非ISS特有，需功能分析"
+    },
+    {
+      "exp_id": "EXP-006",
+      "hypothesis": "JGI_validation",
+      "title": "JGI Gs0168319 跨属 CRISPR 缺失验证",
+      "session": "SESSION-007",
+      "date": "2026-04-17",
+      "status": "COMPLETED",
+      "verdict": "⚪ DATA_UNAVAILABLE",
+      "method": "NCBI Entrez 搜索相同属的ISS相关基因组",
+      "result": "JGI 899株未在NCBI注册；NCBI中Corynebacterium 4株为临床株误匹配（过滤后0株ISS）",
+      "key_finding": "临床收藏编号 'str. ISS NNNN' 与 'International Space Station' 关键词误匹配，类似PSR-017原理（BUG-010）"
+    },
+    {
+      "exp_id": "EXP-007",
+      "hypothesis": "H-003_replication_metagenome",
+      "title": "GLDS-224 宏基因组 CRISPR KO 密度（H-003 宏基因组层面复现）",
+      "session": "SESSION-007",
+      "date": "2026-04-17",
+      "status": "COMPLETED",
+      "verdict": "✅ REPLICATED",
+      "method": "GLDS-224 TSV KO_ID字段，CAS_KO_IDS_VERIFIED（19个KO），归一化by ko_annotated",
+      "result": {
+        "ISS_debris_per_1000KO": 0.668,
+        "Ground_debris_per_1000KO": 1.328,
+        "ratio": "0.50×",
+        "HEPA_note": "ISS HEPA=3.713/千KO（无Ground对照，可能噬菌体偏差，排除分析）"
+      },
+      "scientific_value": "独立于WGS的宏基因组数据独立验证H-003"
+    },
+    {
+      "exp_id": "EXP-008",
+      "hypothesis": "H-new-B → H-new-C",
+      "title": "PRJNA637984 IS 元件密度（H-new-B检验→反驳→H-new-C提出）",
+      "session": "SESSION-008",
+      "date": "2026-04-17",
+      "status": "COMPLETED",
+      "verdict": "❌ H-new-B REFUTED → 🆕 H-new-C PROPOSED",
+      "method": "PRJNA637984 GFF transposase/insertion sequence 关键词匹配，IS/千CDS，Mann-Whitney U，Cliff delta",
+      "result": {
+        "ISS_IS_per_1000CDS": 2.185,
+        "Ground_IS_per_1000CDS": 5.924,
+        "ratio": "0.369×",
+        "direction": "ISS IS元件比Ground少63%（与H-new-B预测方向相反）",
+        "outlier": "GCF_013345775.1 (Cytobacillus firmus) IS=12.314/千CDS"
+      },
+      "interpretation": "H-new-C 基因组精简假说：ISS Bacillales 同时丢失CRISPR和IS元件，暗示封闭环境对防御/重组机制的全面精简",
+      "analogy": "类比M. leprae (Moran 2008) 宿主专化基因组精简"
+    },
+    {
+      "exp_id": "EXP-009",
+      "hypothesis": "H-003_replication_community",
+      "title": "GLDS-224 群落物种组成（H-003 群落生态层面复现）",
+      "session": "SESSION-008",
+      "date": "2026-04-17",
+      "status": "COMPLETED",
+      "verdict": "✅ REPLICATED",
+      "method": "GLDS-224 TSV taxid字段 → 门/属分类，Shannon H' 多样性",
+      "result": {
+        "Ground_dust_Shannon_H": 4.445,
+        "Ground_dust_richness_genera": 769,
+        "ISS_dust_Shannon_H": 2.063,
+        "ISS_dust_richness_genera": 126,
+        "ISS_hepa_Shannon_H": 1.775,
+        "diversity_drop_pct": "53.6% (Ground→ISS_dust)",
+        "Firmicutes_Ground_pct": 2.14,
+        "Firmicutes_ISS_dust_pct": 47.69,
+        "ISS_top_genus_1": "Staphylococcus 20.2%",
+        "ISS_top_genus_2": "Corynebacterium 11.2%"
+      },
+      "scientific_value": "群落生态层面第三次独立验证H-003；与JGI Gs0168319物种组成（Staphylococcus最多）高度吻合"
+    },
+    {
+      "exp_id": "EXP-010",
+      "hypothesis": "H-new-A",
+      "title": "PRJNA637984 孢子化/生物膜基因分析",
+      "session": "SESSION-008",
+      "date": "2026-04-17",
+      "status": "COMPLETED",
+      "verdict": "⚪ INCONCLUSIVE",
+      "method": "PRJNA637984 GFF product= 短语匹配，Mann-Whitney U + BH FDR + Cliff delta",
+      "result": {
+        "cotB": {"ISS_mean": 0.733, "Ground_mean": 0.036, "cliff_delta": 0.344, "p_adj": 0.4018},
+        "tasA": {"ISS_mean": 0.300, "Ground_mean": 0.273, "cliff_delta": 0.027, "p_adj": 1.0},
+        "spo0A_count": "0/0 两组均无检出（注释术语不匹配）"
+      },
+      "limitation": "GFF中product名不含spo0A/sigF等标准术语；需KEGG ko04112 KO IDs重分析",
+      "next_step": "KEGG ko04112 (Sporulation in B. subtilis) KO ID列表重做"
+    },
+    {
+      "exp_id": "EXP-012",
+      "hypothesis": "H-003 (精化) + H-new-C (物种内验证)",
+      "title": "物种分层CRISPR+IS缺口分析（Fisher精确检验 + Mann-Whitney U）",
+      "session": "SESSION-009",
+      "date": "2026-04-17",
+      "status": "COMPLETED",
+      "verdict": "✅ H-003 REFINED; ✅ H-new-C PARTIALLY CONFIRMED",
+      "method": "Fisher精确检验（纯Python log-gamma）+ Mann-Whitney U + Cliff's delta；PRJNA637984 30 ISS + 55 Ground GFF物种分层",
+      "result": {
+        "CRISPR_fisher": {
+          "P_polymyxa": {"ISS": "0/9", "Ground": "8/15 (53%)", "p": 0.009496, "verdict": "⭐ ISS特异显著"},
+          "B_thuringiensis": {"ISS": "0/11", "Ground": "0/15", "p": 1.0, "verdict": "天然特征"},
+          "B_amyloliquefaciens": {"ISS": "0/9", "Ground": "0/15", "p": 1.0, "verdict": "天然特征"},
+          "C_firmus": {"ISS": "0/1", "Ground": "0/10", "p": 1.0, "verdict": "n=1不足"}
+        },
+        "IS_MannWhitney": {
+          "B_thuringiensis": {"ISS_mean": 1.294, "Ground_mean": 11.221, "ratio": "0.115×", "Cliff_delta": -1.0, "p": 0.000019, "verdict": "⭐ H-new-C支撑"},
+          "B_amyloliquefaciens": {"ISS_mean": 2.768, "Ground_mean": 1.916, "ratio": "1.445×", "Cliff_delta": 0.5704, "p": 0.021693, "verdict": "⚠️ IS增加，H-new-C反例"},
+          "P_polymyxa": {"ISS_mean": 1.567, "Ground_mean": 5.026, "ratio": "0.312×", "Cliff_delta": -1.0, "p": 0.000057, "verdict": "⭐ H-new-C支撑"},
+          "C_firmus": {"ISS_mean": 12.314, "Ground_mean": 5.337, "ratio": "2.308×", "p": 0.113846, "verdict": "n=1 ns"}
+        },
+        "CRISPR_IS_coloss_P_polymyxa": {
+          "CRISPR_negative_IS_mean": 2.737,
+          "CRISPR_positive_IS_mean": 5.712,
+          "p": 0.003289,
+          "Cliff_delta": -0.75,
+          "verdict": "⭐ CRISPR×IS共缺失相关（H-new-C机制支撑）"
+        }
+      },
+      "revision": "H-003表述修正：原'30/30=100%'改为'P. polymyxa物种内Fisher p=0.0095'；其余3物种天然无CRISPR与ISS无关",
+      "important_exception": "B. amyloliquefaciens IS增加（1.445×，p=0.022）——H-new-C非普适性，论文需讨论",
+      "generated_files": [
+        "science_engine/reports/paper_readiness_gap_report.md",
+        "science_engine/preprocess/output/gap_analysis_species_stratified.csv"
+      ]
+    },
+    {
+      "exp_id": "EXP-011",
+      "hypothesis": "H-new-D",
+      "title": "GLDS-132 ISS×Chernobyl 真菌基因组组装统计比较",
+      "session": "SESSION-008",
+      "date": "2026-04-17",
+      "status": "COMPLETED",
+      "verdict": "⚪ EXPLORATORY",
+      "method": "assembly_stats.txt + FASTA GC计算 + RepeatMasker输出",
+      "result": {
+        "ISS_Niger": {"N50_kb": 217.6, "GC_pct": 49.46, "genome_Mb": 36.1},
+        "Chernobyl_mean_N50_kb": 69.8,
+        "Soil_mean_N50_kb": 447.9,
+        "N50_gradient": "Soil >> ISS > Chernobyl",
+        "C_cladosporioides_GC_anomaly": "42.08% (unusually low for melanized fungus)"
+      },
+      "limitation": "无CDS注释（BUG-013）；n(ISS)=1；F.solani 7z跳过（BUG-014）",
+      "interpretation": "Chernobyl N50最低，提示高辐射→更多基因组碎片化（探索性）"
+    }
+  ],
+  "top_candidates": {
+    "description": "当前最高置信度科学发现（多数据集验证）",
+    "candidates": [
+      {
+        "rank": 1,
+        "finding": "H-003 P. polymyxa ISS特异性CRISPR缺失（物种分层精化版）",
+        "confidence": "HIGH",
+        "evidence_count": "3个独立数据集 + 物种内Fisher精确检验",
+        "key_stat": "P. polymyxa: Fisher p=0.0095 (ISS 0/9 vs Ground 8/15=53%)；GLDS-224宏基因组0.50×Ground；群落Firmicutes+22×"
+      },
+      {
+        "rank": 2,
+        "finding": "H-new-C CRISPR×IS防御系统共缺失（P. polymyxa + B. thuringiensis）",
+        "confidence": "MEDIUM-HIGH",
+        "evidence_count": "物种内Mann-Whitney + co-loss相关",
+        "key_stat": "P.po IS 0.312× (p<0.001, δ=-1.0); B.thu IS 0.115× (p<0.001, δ=-1.0); CRISPR×IS共缺失 p=0.0033; 注意: B.amy IS反向增加(1.445×)"
+      },
+      {
+        "rank": 3,
+        "finding": "KVTAG 自切割位点结构保守",
+        "confidence": "HIGH",
+        "evidence_count": "4物种 AF3+CIF",
+        "key_stat": "K92-A95-G96，ω=171-178°，键长1.329-1.342Å"
+      }
+    ],
+    "last_updated": "2026-04-17 SESSION-009"
+  },
+  "negative_results": {
+    "description": "未被验证的假设（负面结果同等重要）",
+    "results": [
+      {
+        "hypothesis": "H-001 LexA多拷贝",
+        "verdict": "RETRACTED",
+        "reason": "PSR-017关键词伪计数（'SOS'→stressosome/lysosomal）"
+      },
+      {
+        "hypothesis": "H-002 抗氧化基因扩增",
+        "verdict": "NOT_SUPPORTED",
+        "reason": "sodA/katA/dps/ahpC拷贝数ISS=Ground，Cliff delta<0.2"
+      },
+      {
+        "hypothesis": "H-new-B IS元件富集",
+        "verdict": "REFUTED",
+        "reason": "IS实际减少63%，方向与预期相反；反驳→衍生H-new-C基因组精简假说"
+      }
+    ]
+  }
+}
