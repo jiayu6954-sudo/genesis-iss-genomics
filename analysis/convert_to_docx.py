@@ -23,11 +23,19 @@ SUP_MAP   = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4',
              '⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-'}
 
 def normalise(text: str) -> str:
-    """Clean text for Word — preserve superscripts for explicit rendering."""
-    text = text.replace("\\'", "\u2019")   # backslash-escaped apostrophe → '
+    """Clean text for Word/bioRxiv — ASCII-safe replacements."""
+    text = text.replace("\\'", "\u2019")   # backslash apostrophe → '
     text = text.replace('\u2212', '-')      # minus sign → hyphen
-    text = text.replace('--', '\u2013')    # double hyphen → en-dash
-    # subscripts to plain digits (rare in this manuscript)
+    text = text.replace('\u2014', '--')    # em-dash — → --  (bioRxiv rejects U+2014)
+    text = text.replace('\u2013', '-')     # en-dash – → -
+    text = text.replace('\u00d7', 'x')    # multiplication x → x (bioRxiv rejects U+00D7)
+    text = text.replace('--', '--')        # keep double-hyphen as-is
+    # Greek letters bioRxiv text field may reject
+    text = text.replace('\u03b4', 'delta') # δ → delta
+    text = text.replace('\u03b1', 'alpha') # α → alpha
+    text = text.replace('\u03b2', 'beta')  # β → beta
+    text = text.replace('\u03c0', 'pi')    # π → pi
+    # subscripts to plain digits
     for k, v in {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4',
                  '₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'}.items():
         text = text.replace(k, v)
