@@ -183,7 +183,7 @@ All analyses were implemented in Python 3.11 without external statistical librar
 
 ## Data Availability
 
-Raw genome data (GFF3 and FASTA files) for ISS isolates are publicly available via NCBI BioProject PRJNA637984. Ground comparison genome accession numbers are listed in Supplementary Table S2. GLDS-224 metagenomics data are available at NASA GeneLab (https://genelab.nasa.gov/). Analysis scripts, derived data tables, and Supplementary Tables are archived at GitHub (https://github.com/jiayu6954-sudo/genesis-iss-genomics) and Zenodo (DOI to be assigned upon repository release).
+Raw genome data (GFF3 and FASTA files) for ISS isolates are publicly available via NCBI BioProject PRJNA637984. Ground comparison genome accession numbers are listed in Supplementary Table S2. GLDS-224 metagenomics data are available at NASA GeneLab (https://genelab.nasa.gov/). Analysis scripts, derived data tables, and Supplementary Tables are archived at GitHub (https://github.com/jiayu6954-sudo/genesis-iss-genomics) and Zenodo (https://doi.org/10.5281/zenodo.19638104).
 
 ---
 
