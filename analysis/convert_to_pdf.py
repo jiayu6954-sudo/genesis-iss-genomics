@@ -349,18 +349,17 @@ def build_pdf(md_path: Path, out_path: Path):
                 segs = split_inline(' '.join(abs_buf))
                 bx, by = pdf.l_margin, pdf.get_y()
                 bw = pdf.w - pdf.l_margin - pdf.r_margin
+                # Estimate height from character count (no ghost render)
+                pdf.set_font(pdf.F, '', 9)
+                avg_cpl = int((bw - 6) / 1.85)  # ~chars per line at 9pt Arial
+                n_lines = max(1, -(-len(full) // avg_cpl))  # ceil division
+                bh = n_lines * LINE_H_SM + 8
+                # Draw background rect first
                 pdf.set_fill_color(*BLUE_BG)
                 pdf.set_draw_color(*HEAD2)
                 pdf.set_line_width(0.3)
-                # ghost render to measure height
-                pdf.set_font(pdf.F, '', 9)
-                phantom_y = pdf.get_y()
-                pdf.set_xy(bx + 3, by + 3)
-                pdf.multi_cell(bw - 6, LINE_H_SM, full)
-                bh = pdf.get_y() - phantom_y + 4
-                # fill rect
                 pdf.rect(bx, by, bw, bh, style='DF')
-                # actual text
+                # Render text once on top
                 pdf.set_xy(bx + 3, by + 3)
                 pdf.set_font(pdf.F, '', 9)
                 pdf.multi_cell(bw - 6, LINE_H_SM, full)
