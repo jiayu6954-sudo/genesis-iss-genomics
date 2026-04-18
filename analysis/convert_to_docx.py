@@ -17,15 +17,35 @@ FIG_DIR  = PROJECT_ROOT / 'science_engine/figures'
 OUT_DOCX = PROJECT_ROOT / 'science_engine/reports/manuscript_draft_v1.docx'
 
 
+# Superscript Unicode chars (kept for Word superscript rendering)
+SUP_CHARS = set('⁰¹²³⁴⁵⁶⁷⁸⁹⁻')
+SUP_MAP   = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4',
+             '⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-'}
+
 def normalise(text: str) -> str:
-    sup = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4',
-           '⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-',
-           '₀':'0','₁':'1','₂':'2','₃':'3','₄':'4',
-           '₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'}
-    for k, v in sup.items():
+    """Clean text for Word — preserve superscripts for explicit rendering."""
+    text = text.replace("\\'", "\u2019")   # backslash-escaped apostrophe → '
+    text = text.replace('\u2212', '-')      # minus sign → hyphen
+    text = text.replace('--', '\u2013')    # double hyphen → en-dash
+    # subscripts to plain digits (rare in this manuscript)
+    for k, v in {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4',
+                 '₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'}.items():
         text = text.replace(k, v)
-    text = text.replace('\u2212', '-')
     return text
+
+
+def split_superscripts(text: str):
+    """Yield (is_superscript, chunk) pairs for superscript-aware rendering."""
+    buf, is_sup = '', False
+    for ch in text:
+        s = ch in SUP_CHARS
+        if s != is_sup:
+            if buf:
+                yield is_sup, buf
+            buf, is_sup = '', s
+        buf += ch
+    if buf:
+        yield is_sup, buf
 
 
 def add_line_numbers(doc):
@@ -47,20 +67,25 @@ def set_page_margins(doc):
 
 
 def add_run_styled(para, text: str, bold=False, italic=False,
-                   size=None, color=None):
-    """Add a run with mixed bold/italic to a paragraph."""
-    run = para.add_run(text)
-    run.bold   = bold
-    run.italic = italic
-    if size:
-        run.font.size = Pt(size)
-    if color:
-        run.font.color.rgb = RGBColor(*color)
-    return run
+                   size=None, color=None, superscript=False):
+    """Add runs to para, splitting on superscript chars when needed."""
+    if not text:
+        return
+    for is_sup, chunk in split_superscripts(text):
+        run = para.add_run(SUP_MAP.get(chunk, chunk) if is_sup
+                           else chunk)
+        run.bold   = bold
+        run.italic = italic
+        if size:
+            run.font.size = Pt(size - 2 if is_sup else size)
+        if color:
+            run.font.color.rgb = RGBColor(*color)
+        if is_sup or superscript:
+            run.font.superscript = True
 
 
 def render_inline(para, text: str, base_size=11):
-    """Parse **bold**, *italic*, ***bold-italic*** and add runs."""
+    """Parse **bold**, *italic*, ***bold-italic*** and add runs with superscripts."""
     text = normalise(text)
     pattern = re.compile(
         r'(\*\*\*(.+?)\*\*\*'   # bold-italic
@@ -263,9 +288,13 @@ def build_docx(md_path: Path, out_path: Path):
                 ap = doc.add_paragraph()
                 ap.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 r1 = ap.add_run('ZJY')
-                r1.bold = True; r1.font.size = Pt(12)
-                ap.add_run('\nChina').italic = True
-                ap.runs[-1].font.size = Pt(10)
+                r1.font.size = Pt(12)
+                r1.bold = True
+                ap2 = doc.add_paragraph()
+                ap2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                r2 = ap2.add_run('Affiliation: China')
+                r2.font.size = Pt(10)
+                r2.italic = True
                 author_done = True
             i += 1; continue
         if raw.startswith('**Correspondence:**'):
